@@ -17,7 +17,6 @@ function SaveButton ({onClick}) {
         let env = {history: [1,2,3], count: 0}
         let handler = function (event) {
             event.preventDefault()
-            console.log('click!')
             env.count++
             console.log(`my click count is: ${env.count}`)
         }
@@ -25,7 +24,7 @@ function SaveButton ({onClick}) {
     }
 
      return (
-         <button onClick={makeFunc()}>Save</button>
+         <button onClick={onClick}>Save</button>
      )
 }
 
@@ -41,24 +40,43 @@ function AlertBox ({status}) {
     }
 }
 
+
+
 class SaveManager extends React.Component {
     constructor (props) {
         super(props)
         this.state = { saveStatus: IDLE}
     }
 
+
     save = () => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                if (Math.random() > 0.5) {
+                fetch('https://yesno.wtf/api')
+                .then( resp => resp.json())
+                .then(function(data) {
+                    console.log(data)
+                    if (data.answer == "yes") {
+                    var body = document.querySelector('body'),
+                    myImage = new Image();
+                    myImage.src = data.image
+                    body.appendChild(myImage);
                     resolve()
-                } else {
-                    reject()
-                }
+                    
+                    } else  {
+                        var body = document.querySelector('body'),
+                        myImage = new Image();
+                        myImage.src = data.image
+                        body.appendChild(myImage);
+                        reject()
+                    }  
+                })
+                .catch( err => console.log(err))
             }, 1000)
         })
     }
-
+        
+        
     handleSave = (event) => {
         event.preventDefault()
         this.setState(() => ({ saveStatus: WAITING}))
